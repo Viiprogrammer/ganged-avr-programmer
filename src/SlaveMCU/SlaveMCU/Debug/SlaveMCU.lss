@@ -1,0 +1,274 @@
+
+SlaveMCU.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .data         00000000  00800100  00800100  000001b4  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  1 .text         00000140  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .bss          00000003  00800100  00800100  000001b4  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  000001b4  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001e4  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000048  00000000  00000000  00000220  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   000006f2  00000000  00000000  00000268  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 00000617  00000000  00000000  0000095a  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   000002e5  00000000  00000000  00000f71  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000088  00000000  00000000  00001258  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    00000379  00000000  00000000  000012e0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    00000076  00000000  00000000  00001659  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000038  00000000  00000000  000016cf  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	13 c0       	rjmp	.+38     	; 0x28 <__ctors_end>
+   2:	22 c0       	rjmp	.+68     	; 0x48 <__bad_interrupt>
+   4:	22 c0       	rjmp	.+68     	; 0x4a <__vector_2>
+   6:	20 c0       	rjmp	.+64     	; 0x48 <__bad_interrupt>
+   8:	1f c0       	rjmp	.+62     	; 0x48 <__bad_interrupt>
+   a:	1e c0       	rjmp	.+60     	; 0x48 <__bad_interrupt>
+   c:	1d c0       	rjmp	.+58     	; 0x48 <__bad_interrupt>
+   e:	1c c0       	rjmp	.+56     	; 0x48 <__bad_interrupt>
+  10:	1b c0       	rjmp	.+54     	; 0x48 <__bad_interrupt>
+  12:	1a c0       	rjmp	.+52     	; 0x48 <__bad_interrupt>
+  14:	19 c0       	rjmp	.+50     	; 0x48 <__bad_interrupt>
+  16:	18 c0       	rjmp	.+48     	; 0x48 <__bad_interrupt>
+  18:	17 c0       	rjmp	.+46     	; 0x48 <__bad_interrupt>
+  1a:	16 c0       	rjmp	.+44     	; 0x48 <__bad_interrupt>
+  1c:	15 c0       	rjmp	.+42     	; 0x48 <__bad_interrupt>
+  1e:	14 c0       	rjmp	.+40     	; 0x48 <__bad_interrupt>
+  20:	13 c0       	rjmp	.+38     	; 0x48 <__bad_interrupt>
+  22:	12 c0       	rjmp	.+36     	; 0x48 <__bad_interrupt>
+  24:	11 c0       	rjmp	.+34     	; 0x48 <__bad_interrupt>
+  26:	10 c0       	rjmp	.+32     	; 0x48 <__bad_interrupt>
+
+00000028 <__ctors_end>:
+  28:	11 24       	eor	r1, r1
+  2a:	1f be       	out	0x3f, r1	; 63
+  2c:	cf ef       	ldi	r28, 0xFF	; 255
+  2e:	d2 e0       	ldi	r29, 0x02	; 2
+  30:	de bf       	out	0x3e, r29	; 62
+  32:	cd bf       	out	0x3d, r28	; 61
+
+00000034 <__do_clear_bss>:
+  34:	21 e0       	ldi	r18, 0x01	; 1
+  36:	a0 e0       	ldi	r26, 0x00	; 0
+  38:	b1 e0       	ldi	r27, 0x01	; 1
+  3a:	01 c0       	rjmp	.+2      	; 0x3e <.do_clear_bss_start>
+
+0000003c <.do_clear_bss_loop>:
+  3c:	1d 92       	st	X+, r1
+
+0000003e <.do_clear_bss_start>:
+  3e:	a3 30       	cpi	r26, 0x03	; 3
+  40:	b2 07       	cpc	r27, r18
+  42:	e1 f7       	brne	.-8      	; 0x3c <.do_clear_bss_loop>
+  44:	66 d0       	rcall	.+204    	; 0x112 <main>
+  46:	7a c0       	rjmp	.+244    	; 0x13c <_exit>
+
+00000048 <__bad_interrupt>:
+  48:	db cf       	rjmp	.-74     	; 0x0 <__vectors>
+
+0000004a <__vector_2>:
+
+volatile uint8_t nubbleNum = 0;
+volatile uint8_t buffer = 0;
+volatile bool received = false;
+
+ISR (INT1_vect) {
+  4a:	1f 92       	push	r1
+  4c:	0f 92       	push	r0
+  4e:	0f b6       	in	r0, 0x3f	; 63
+  50:	0f 92       	push	r0
+  52:	11 24       	eor	r1, r1
+  54:	8f 93       	push	r24
+  56:	9f 93       	push	r25
+	if (nubbleNum == 0) {
+  58:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <nubbleNum>
+  5c:	81 11       	cpse	r24, r1
+  5e:	09 c0       	rjmp	.+18     	; 0x72 <__vector_2+0x28>
+		buffer = (PIND & 0b11110000) >> 4;
+  60:	89 b1       	in	r24, 0x09	; 9
+  62:	82 95       	swap	r24
+  64:	8f 70       	andi	r24, 0x0F	; 15
+  66:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <buffer>
+		nubbleNum = 1;
+  6a:	81 e0       	ldi	r24, 0x01	; 1
+  6c:	80 93 02 01 	sts	0x0102, r24	; 0x800102 <nubbleNum>
+  70:	0c c0       	rjmp	.+24     	; 0x8a <__vector_2+0x40>
+	} else {
+		buffer |= PIND & 0b11110000;
+  72:	89 b1       	in	r24, 0x09	; 9
+  74:	90 91 01 01 	lds	r25, 0x0101	; 0x800101 <buffer>
+  78:	80 7f       	andi	r24, 0xF0	; 240
+  7a:	89 2b       	or	r24, r25
+  7c:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <buffer>
+		nubbleNum = 0;
+  80:	10 92 02 01 	sts	0x0102, r1	; 0x800102 <nubbleNum>
+		received = true;
+  84:	81 e0       	ldi	r24, 0x01	; 1
+  86:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+	}
+}
+  8a:	9f 91       	pop	r25
+  8c:	8f 91       	pop	r24
+  8e:	0f 90       	pop	r0
+  90:	0f be       	out	0x3f, r0	; 63
+  92:	0f 90       	pop	r0
+  94:	1f 90       	pop	r1
+  96:	18 95       	reti
+
+00000098 <InitInterrupts>:
+
+void InitInterrupts () {
+	EICRA |= _SET(ISC11);
+  98:	e9 e6       	ldi	r30, 0x69	; 105
+  9a:	f0 e0       	ldi	r31, 0x00	; 0
+  9c:	80 81       	ld	r24, Z
+  9e:	88 60       	ori	r24, 0x08	; 8
+  a0:	80 83       	st	Z, r24
+	EICRA |= _SET(ISC10);
+  a2:	80 81       	ld	r24, Z
+  a4:	84 60       	ori	r24, 0x04	; 4
+  a6:	80 83       	st	Z, r24
+	EIMSK |= _SET(INT1);
+  a8:	8d b3       	in	r24, 0x1d	; 29
+  aa:	82 60       	ori	r24, 0x02	; 2
+  ac:	8d bb       	out	0x1d, r24	; 29
+  ae:	08 95       	ret
+
+000000b0 <InitBus>:
+}
+
+void InitBus () {
+	DDRD &= _CLR(PD3); // Clock
+  b0:	8a b1       	in	r24, 0x0a	; 10
+  b2:	87 7f       	andi	r24, 0xF7	; 247
+  b4:	8a b9       	out	0x0a, r24	; 10
+	DDRD &= _CLR(PD4); // DATA 1
+  b6:	8a b1       	in	r24, 0x0a	; 10
+  b8:	8f 7e       	andi	r24, 0xEF	; 239
+  ba:	8a b9       	out	0x0a, r24	; 10
+	DDRD &= _CLR(PD5); // DATA 2
+  bc:	8a b1       	in	r24, 0x0a	; 10
+  be:	8f 7d       	andi	r24, 0xDF	; 223
+  c0:	8a b9       	out	0x0a, r24	; 10
+	DDRD &= _CLR(PD6); // DATA 3
+  c2:	8a b1       	in	r24, 0x0a	; 10
+  c4:	8f 7b       	andi	r24, 0xBF	; 191
+  c6:	8a b9       	out	0x0a, r24	; 10
+	DDRD &= _CLR(PD7); // DATA 4
+  c8:	8a b1       	in	r24, 0x0a	; 10
+  ca:	8f 77       	andi	r24, 0x7F	; 127
+  cc:	8a b9       	out	0x0a, r24	; 10
+	PORTD |=  _SET(PD3) | _SET(PD4) | _SET(PD5) | _SET(PD6) | _SET(PD7);
+  ce:	8b b1       	in	r24, 0x0b	; 11
+  d0:	88 6f       	ori	r24, 0xF8	; 248
+  d2:	8b b9       	out	0x0b, r24	; 11
+  d4:	08 95       	ret
+
+000000d6 <SPIInit>:
+}
+
+void SPIInit(void)
+{
+   SPI_DDRX |= _SET(SPI_MOSI) | _SET(SPI_SCK) | _SET(SPI_SS);
+  d6:	84 b1       	in	r24, 0x04	; 4
+  d8:	8c 62       	ori	r24, 0x2C	; 44
+  da:	84 b9       	out	0x04, r24	; 4
+   SPI_DDRX &= _CLR(SPI_MISO);
+  dc:	84 b1       	in	r24, 0x04	; 4
+  de:	8f 7e       	andi	r24, 0xEF	; 239
+  e0:	84 b9       	out	0x04, r24	; 4
+   SPI_PORTX |= _SET(SPI_MOSI)| _SET(SPI_SCK) | _SET(SPI_SS) | _SET(SPI_MISO);
+  e2:	85 b1       	in	r24, 0x05	; 5
+  e4:	8c 63       	ori	r24, 0x3C	; 60
+  e6:	85 b9       	out	0x05, r24	; 5
+
+   SPCR |= _SET(SPE) | _SET(MSTR) | _SET(SPR1) | _SET(SPR0);
+  e8:	8c b5       	in	r24, 0x2c	; 44
+  ea:	83 65       	ori	r24, 0x53	; 83
+  ec:	8c bd       	out	0x2c, r24	; 44
+   SPCR &= _CLR(DORD) | _CLR(CPOL) | _CLR(CPHA) | _CLR(CPHA);
+  ee:	8c b5       	in	r24, 0x2c	; 44
+  f0:	8c bd       	out	0x2c, r24	; 44
+   SPSR &= _CLR(SPI2X);
+  f2:	8d b5       	in	r24, 0x2d	; 45
+  f4:	8e 7f       	andi	r24, 0xFE	; 254
+  f6:	8d bd       	out	0x2d, r24	; 45
+  f8:	08 95       	ret
+
+000000fa <SPI_WriteByte>:
+}
+
+uint8_t SPI_WriteByte(uint8_t data)
+{
+	SPI_PORTX &= _CLR(SPI_SS);
+  fa:	95 b1       	in	r25, 0x05	; 5
+  fc:	9b 7f       	andi	r25, 0xFB	; 251
+  fe:	95 b9       	out	0x05, r25	; 5
+	SPDR = data;
+ 100:	8e bd       	out	0x2e, r24	; 46
+	while(!(SPSR & _SET(SPIF)));
+ 102:	0d b4       	in	r0, 0x2d	; 45
+ 104:	07 fe       	sbrs	r0, 7
+ 106:	fd cf       	rjmp	.-6      	; 0x102 <SPI_WriteByte+0x8>
+	SPI_PORTX |= _SET(SPI_SS);
+ 108:	85 b1       	in	r24, 0x05	; 5
+ 10a:	84 60       	ori	r24, 0x04	; 4
+ 10c:	85 b9       	out	0x05, r24	; 5
+	return SPDR;
+ 10e:	8e b5       	in	r24, 0x2e	; 46
+}
+ 110:	08 95       	ret
+
+00000112 <main>:
+
+int main(void)
+{
+	InitBus();
+ 112:	ce df       	rcall	.-100    	; 0xb0 <InitBus>
+	InitInterrupts();
+ 114:	c1 df       	rcall	.-126    	; 0x98 <InitInterrupts>
+	SPIInit();
+ 116:	df df       	rcall	.-66     	; 0xd6 <SPIInit>
+	DDRC = 0xFF;
+ 118:	8f ef       	ldi	r24, 0xFF	; 255
+ 11a:	87 b9       	out	0x07, r24	; 7
+	sei();
+ 11c:	78 94       	sei
+    while (1)
+    {
+		if (received) {
+ 11e:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 122:	88 23       	and	r24, r24
+ 124:	e1 f3       	breq	.-8      	; 0x11e <main+0xc>
+	      SPI_WriteByte(buffer);
+ 126:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <buffer>
+ 12a:	e7 df       	rcall	.-50     	; 0xfa <SPI_WriteByte>
+		  PORTC = buffer;
+ 12c:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <buffer>
+ 130:	88 b9       	out	0x08, r24	; 8
+		  received = false;
+ 132:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
+		  buffer = 0;
+ 136:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <buffer>
+ 13a:	f1 cf       	rjmp	.-30     	; 0x11e <main+0xc>
+
+0000013c <_exit>:
+ 13c:	f8 94       	cli
+
+0000013e <__stop_program>:
+ 13e:	ff cf       	rjmp	.-2      	; 0x13e <__stop_program>
