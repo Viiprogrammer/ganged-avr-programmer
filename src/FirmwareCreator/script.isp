@@ -1,0 +1,10 @@
+CONNECT 2000000                            ; connect with SCK = 2 MHz
+SPI_VERIFY 0x30, 0x00, 0x00, 0x00, 0x1E    ; check signature byte 0x00 (0x1E = manufactured by Atmel)
+SPI_VERIFY 0x30, 0x00, 0x01, 0x00, 0x93    ; check signature byte 0x01 (0x93 = 8KB Flash memory)
+SPI_VERIFY 0x30, 0x00, 0x02, 0x00, 0x07    ; check signature byte 0x02 (0x07 = ATmega8 device)
+SPI_WRITE  0xAC, 0x80, 0x00, 0x00          ; chip erase
+WAIT 2                                     ; wait 20 ms
+FLASH ./Attiny85_blink.hex, 0, 64          ; flash given hex file starting at flash address 0 with pagesize 64
+DISCONNECT                                 ; disconnect SPI
+DEC_COUNTER 10                             ; allow 10 programming cycles
+END
